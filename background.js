@@ -67,17 +67,26 @@ async function sortByWebsite() {
     (tab) => !tab.pinned && tab.groupId === chrome.tabGroups.TAB_GROUP_ID_NONE,
   );
 
+  // Cache URL sort keys to avoid redundant parsing during comparison
+  const sortKeyCache = new Map();
+  const getCachedSortKey = (url) => {
+    if (!sortKeyCache.has(url)) {
+      sortKeyCache.set(url, getUrlSortKey(url));
+    }
+    return sortKeyCache.get(url);
+  };
+
   // Sort pinned tabs by website
   pinnedTabs.sort((a, b) => {
-    const keyA = getUrlSortKey(a.url);
-    const keyB = getUrlSortKey(b.url);
+    const keyA = getCachedSortKey(a.url);
+    const keyB = getCachedSortKey(b.url);
     return keyA.localeCompare(keyB);
   });
 
   // Sort ungrouped tabs by website
   ungroupedTabs.sort((a, b) => {
-    const keyA = getUrlSortKey(a.url);
-    const keyB = getUrlSortKey(b.url);
+    const keyA = getCachedSortKey(a.url);
+    const keyB = getCachedSortKey(b.url);
     return keyA.localeCompare(keyB);
   });
 
