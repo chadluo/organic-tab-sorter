@@ -28,18 +28,22 @@ function getUrlSortKey(url) {
 async function sortByTitle() {
   const tabs = await chrome.tabs.query({ currentWindow: true });
 
-  // Separate pinned and unpinned tabs
+  // Separate tabs into categories: pinned, grouped, and ungrouped
   const pinnedTabs = tabs.filter(tab => tab.pinned);
-  const unpinnedTabs = tabs.filter(tab => !tab.pinned);
+  const groupedTabs = tabs.filter(tab => !tab.pinned && tab.groupId !== chrome.tabGroups.TAB_GROUP_ID_NONE);
+  const ungroupedTabs = tabs.filter(tab => !tab.pinned && tab.groupId === chrome.tabGroups.TAB_GROUP_ID_NONE);
 
   // Sort pinned tabs by title
   pinnedTabs.sort((a, b) => a.title.localeCompare(b.title));
 
-  // Sort unpinned tabs by title
-  unpinnedTabs.sort((a, b) => a.title.localeCompare(b.title));
+  // Sort ungrouped tabs by title
+  ungroupedTabs.sort((a, b) => a.title.localeCompare(b.title));
 
-  // Move tabs to their new positions
-  const sortedTabs = [...pinnedTabs, ...unpinnedTabs];
+  // Keep grouped tabs in their original order (preserve group internal order)
+  // Grouped tabs are already in the correct relative order from the query
+
+  // Move tabs to their new positions: pinned first, then grouped, then ungrouped
+  const sortedTabs = [...pinnedTabs, ...groupedTabs, ...ungroupedTabs];
   for (let i = 0; i < sortedTabs.length; i++) {
     await chrome.tabs.move(sortedTabs[i].id, { index: i });
   }
@@ -49,9 +53,10 @@ async function sortByTitle() {
 async function sortByUrl() {
   const tabs = await chrome.tabs.query({ currentWindow: true });
 
-  // Separate pinned and unpinned tabs
+  // Separate tabs into categories: pinned, grouped, and ungrouped
   const pinnedTabs = tabs.filter(tab => tab.pinned);
-  const unpinnedTabs = tabs.filter(tab => !tab.pinned);
+  const groupedTabs = tabs.filter(tab => !tab.pinned && tab.groupId !== chrome.tabGroups.TAB_GROUP_ID_NONE);
+  const ungroupedTabs = tabs.filter(tab => !tab.pinned && tab.groupId === chrome.tabGroups.TAB_GROUP_ID_NONE);
 
   // Sort pinned tabs by URL
   pinnedTabs.sort((a, b) => {
@@ -60,15 +65,18 @@ async function sortByUrl() {
     return keyA.localeCompare(keyB);
   });
 
-  // Sort unpinned tabs by URL
-  unpinnedTabs.sort((a, b) => {
+  // Sort ungrouped tabs by URL
+  ungroupedTabs.sort((a, b) => {
     const keyA = getUrlSortKey(a.url);
     const keyB = getUrlSortKey(b.url);
     return keyA.localeCompare(keyB);
   });
 
-  // Move tabs to their new positions
-  const sortedTabs = [...pinnedTabs, ...unpinnedTabs];
+  // Keep grouped tabs in their original order (preserve group internal order)
+  // Grouped tabs are already in the correct relative order from the query
+
+  // Move tabs to their new positions: pinned first, then grouped, then ungrouped
+  const sortedTabs = [...pinnedTabs, ...groupedTabs, ...ungroupedTabs];
   for (let i = 0; i < sortedTabs.length; i++) {
     await chrome.tabs.move(sortedTabs[i].id, { index: i });
   }

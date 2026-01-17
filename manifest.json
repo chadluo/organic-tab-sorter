@@ -3,28 +3,32 @@
         "default_icon": "hello_extensions.png",
         "default_popup": "hello.html"
     },
-    "description": "Sort tabs by title or website",
-    "manifest_version": 3,
-    "name": "Organic Tab Sorter",
-    "version": "0.0.1",
-    "permissions": ["tabs", "storage"],
     "background": {
         "service_worker": "background.js"
     },
     "commands": {
         "sort-by-title": {
+            "description": "Sort tabs by title",
             "suggested_key": {
                 "default": "Alt+Shift+T",
                 "mac": "Alt+Shift+T"
-            },
-            "description": "Sort tabs by title"
+            }
         },
         "sort-by-url": {
+            "description": "Sort tabs by URL",
             "suggested_key": {
                 "default": "Alt+Shift+U",
                 "mac": "Alt+Shift+U"
-            },
-            "description": "Sort tabs by URL"
+            }
         }
-    }
+    },
+    "description": "Sort tabs by title or website",
+    "manifest_version": 3,
+    "name": "Organic Tab Sorter",
+    "permissions": [
+        "tabs",
+        "storage",
+        "tabGroups"
+    ],
+    "version": "0.0.1"
 }
