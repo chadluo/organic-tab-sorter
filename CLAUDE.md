@@ -12,7 +12,7 @@ The extension follows a standard Manifest V3 Chrome extension structure with a b
 
 ### Core Files
 
-- **manifest.json**: Extension configuration with permissions (`tabs`, `storage`), keyboard commands, and background service worker definition
+- **manifest.json**: Extension configuration with permissions (`tabs`, `storage`, `tabGroups`), keyboard commands, and background service worker definition
 - **background.js**: Background service worker that handles all tab sorting logic and listens for keyboard shortcuts
 - **hello.html**: Popup UI with sort buttons, settings controls, and visual feedback
 - **popup.js**: Popup script that handles UI interactions and communicates with background worker via message passing
@@ -21,17 +21,22 @@ The extension follows a standard Manifest V3 Chrome extension structure with a b
 ### Key Implementation Details
 
 **Sorting Logic (background.js)**:
+
 - `sortByTitle()`: Sorts tabs alphabetically using `localeCompare()`
 - `sortByUrl()`: Domain-aware sorting that parses URLs into sort keys like `/com/google/dev/path`
 - `getUrlSortKey()`: Reverses domain parts (TLD first) and appends path for intelligent grouping
 - Pinned tabs are kept at the beginning and sorted separately within their group
+- Grouped tabs are preserved in their original order and moved to the left side (after pinned tabs, before ungrouped tabs)
+- Only ungrouped tabs are sorted and reordered
 
 **Message Passing Architecture**:
+
 - Popup sends messages to background worker via `chrome.runtime.sendMessage()`
 - Background worker responds with success/error status
 - Keyboard shortcuts trigger sorting directly in background worker without popup
 
 **Settings Storage**:
+
 - Uses `chrome.storage.sync` for cross-device preference sync
 - Stores `defaultSortMode` as either "title" or "url"
 - Settings loaded on popup open and saved on radio button change
@@ -50,15 +55,18 @@ The extension follows a standard Manifest V3 Chrome extension structure with a b
 After making code changes:
 
 **For popup.js or hello.html changes**:
+
 1. Close the popup (if open)
 2. Reopen the popup - changes take effect immediately
 
 **For background.js changes**:
+
 1. Go to `chrome://extensions/`
 2. Click the refresh icon on the Organic Tab Sorter extension card
 3. Test the functionality
 
 **For manifest.json changes**:
+
 1. Go to `chrome://extensions/`
 2. Click "Remove" on the extension
 3. Click "Load unpacked" again to reload with new manifest
@@ -66,9 +74,11 @@ After making code changes:
 ### Testing Keyboard Shortcuts
 
 - Open multiple tabs with various URLs
-- Press `Ctrl+Shift+T` to test title sorting
-- Press `Ctrl+Shift+U` to test URL sorting
+- Create some tab groups with multiple tabs
+- Press `Alt+Shift+T` to test title sorting
+- Press `Alt+Shift+U` to test URL sorting
 - Verify tabs reorder without opening popup
+- Verify grouped tabs move to the left and maintain their internal order
 
 ### Debugging
 
@@ -88,11 +98,13 @@ After making code changes:
 
 - `tabs`: Required to query and reorder tabs in the current window
 - `storage`: Required to persist user's default sort preference
+- `tabGroups`: Required to detect and preserve tab groups during sorting
 
 ### Key APIs Used
 
 - `chrome.tabs.query({ currentWindow: true })`: Get all tabs in active window
 - `chrome.tabs.move(tabId, { index: newIndex })`: Reorder tabs
+- `chrome.tabGroups.TAB_GROUP_ID_NONE`: Constant to identify ungrouped tabs
 - `chrome.commands.onCommand`: Listen for keyboard shortcuts
 - `chrome.runtime.sendMessage()`: Send messages from popup to background
 - `chrome.runtime.onMessage`: Receive messages in background worker
@@ -111,10 +123,26 @@ After making code changes:
 ### Modifying Sort Behavior
 
 All sorting logic is in [background.js](background.js). The two main functions are:
+
 - `sortByTitle()` - Modify for title sorting changes
 - `sortByUrl()` - Modify for URL sorting changes
 - `getUrlSortKey()` - Modify to change how URLs are parsed/grouped
 
+Both sorting functions follow this pattern:
+
+1. Separate tabs into pinned, grouped, and ungrouped categories
+2. Sort only pinned and ungrouped tabs
+3. Preserve grouped tabs in their original order
+4. Arrange final order as: pinned → grouped → ungrouped
+
 ### Changing Keyboard Shortcuts
 
-Edit the `commands` section in [manifest.json](manifest.json). Note that Ctrl+Shift+T conflicts with Chrome's "Reopen closed tab" on some systems - users can customize shortcuts via `chrome://extensions/shortcuts`.
+Edit the `commands` section in [manifest.json](manifest.json). Default shortcuts are `Alt+Shift+T` (title) and `Alt+Shift+U` (URL). Users can customize shortcuts via `chrome://extensions/shortcuts`.
+
+### Working with Tab Groups
+
+Tab groups are handled using the `chrome.tabGroups` API:
+
+- `tab.groupId`: Contains the group ID for grouped tabs, or `chrome.tabGroups.TAB_GROUP_ID_NONE` for ungrouped tabs
+- Grouped tabs are filtered out during sorting to preserve their original order
+- After sorting, grouped tabs are positioned between pinned and ungrouped tabs
