@@ -73,3 +73,26 @@ chrome.storage.sync.get('defaultSortMode', (data) => {
     defaultUrlRadio.checked = true;
   }
 });
+
+// Load and display keyboard shortcuts
+chrome.commands.getAll((commands) => {
+  const shortcutTitleEl = document.getElementById('shortcut-title');
+  const shortcutUrlEl = document.getElementById('shortcut-url');
+
+  commands.forEach((command) => {
+    const shortcut = command.shortcut || 'Not set';
+    if (command.name === 'sort-by-title') {
+      shortcutTitleEl.textContent = `${shortcut}: Sort by Title`;
+    } else if (command.name === 'sort-by-url') {
+      shortcutUrlEl.textContent = `${shortcut}: Sort by URL`;
+    }
+  });
+
+  // Fallback if commands not found
+  if (shortcutTitleEl.textContent === 'Loading...') {
+    shortcutTitleEl.textContent = 'Alt+Shift+T: Sort by Title (default)';
+  }
+  if (shortcutUrlEl.textContent === 'Loading...') {
+    shortcutUrlEl.textContent = 'Alt+Shift+U: Sort by URL (default)';
+  }
+});
