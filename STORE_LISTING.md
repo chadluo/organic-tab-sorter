@@ -20,17 +20,18 @@ Alphabetically sorts tabs by their page titles using standard locale-aware compa
 
 ### Sort by URL
 
-Domain-aware sorting that groups tabs from the same website together. URLs are parsed and sorted by domain hierarchy (TLD, second-level domain, subdomains, then path). For example:
+Domain-aware sorting that groups tabs from the same website together. URLs are parsed and sorted by protocol, then domain hierarchy (excluding generic TLDs like .com/.net/.org), then path. For example:
 
+- All `https://` sites are grouped separately from `chrome://` pages
 - `developers.google.com` and `mail.google.com` appear adjacent
 - `github.com/user/repo1` and `github.com/user/repo2` are grouped together
+- Sites with semantic TLDs (like `.ai`, `.dev`) are kept grouped by those TLDs
 
 ### Keyboard Shortcuts
 
 By default:
 
-- Alt+Shift+T: Sort by title
-- Alt+Shift+U: Sort by URL
+- Alt+Shift+S: Sort tabs using your default sort preference
 - Customizable via chrome://extensions/shortcuts
 
 ### Settings

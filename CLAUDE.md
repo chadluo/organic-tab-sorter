@@ -23,8 +23,8 @@ The extension follows a standard Manifest V3 Chrome extension structure with a b
 **Sorting Logic (background.js)**:
 
 - `sortByTitle()`: Sorts tabs alphabetically using `localeCompare()`
-- `sortByWebsite()`: Domain-aware sorting that parses URLs into sort keys like `/com/google/dev/path`
-- `getUrlSortKey()`: Reverses domain parts (TLD first) and appends path for intelligent grouping
+- `sortByWebsite()`: Domain-aware sorting that parses URLs into sort keys like `/https/google/dev/path`
+- `getUrlSortKey()`: Prepends protocol, reverses domain parts (excluding generic TLDs like .com/.net/.org), and appends path for intelligent grouping
 - Pinned tabs are kept at the beginning and sorted separately within their group
 - Grouped tabs are preserved in their original order and moved to the left side (after pinned tabs, before ungrouped tabs)
 - Only ungrouped tabs are sorted and reordered
@@ -75,8 +75,7 @@ After making code changes:
 
 - Open multiple tabs with various URLs
 - Create some tab groups with multiple tabs
-- Press `Alt+Shift+T` to test title sorting
-- Press `Alt+Shift+W` to test website sorting
+- Press `Alt+Shift+S` to sort using the default sort mode
 - Verify tabs reorder without opening popup
 - Verify grouped tabs move to the left and maintain their internal order
 
@@ -137,7 +136,7 @@ Both sorting functions follow this pattern:
 
 ### Changing Keyboard Shortcuts
 
-Edit the `commands` section in [manifest.json](manifest.json). Default shortcuts are `Alt+Shift+T` (title) and `Alt+Shift+W` (website). Users can customize shortcuts via `chrome://extensions/shortcuts`.
+Edit the `commands` section in [manifest.json](manifest.json). The default shortcut is `Alt+Shift+S` which sorts using the user's default sort mode preference. Users can customize shortcuts via `chrome://extensions/shortcuts`.
 
 ### Working with Tab Groups
 
