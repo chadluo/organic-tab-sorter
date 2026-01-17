@@ -1,6 +1,5 @@
 {
     "action": {
-        "default_icon": "hello_extensions.png",
         "default_popup": "popup.html"
     },
     "background": {
@@ -23,6 +22,9 @@
         }
     },
     "description": "Sort tabs by title or website",
+    "icons": {
+        "128": "icons/icon128.png"
+    },
     "manifest_version": 3,
     "name": "Organic Tab Sorter",
     "permissions": [
