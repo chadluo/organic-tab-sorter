@@ -102,10 +102,16 @@ async function sortByWebsite() {
 
 // Listen for keyboard shortcuts
 chrome.commands.onCommand.addListener((command) => {
-  if (command === "sort-by-title") {
-    sortByTitle();
-  } else if (command === "sort-by-website") {
-    sortByWebsite();
+  if (command === "sort-tabs") {
+    // Use the stored default sort preference
+    chrome.storage.sync.get("defaultSortMode", (data) => {
+      const defaultMode = data.defaultSortMode || "website";
+      if (defaultMode === "title") {
+        sortByTitle();
+      } else {
+        sortByWebsite();
+      }
+    });
   }
 });
 

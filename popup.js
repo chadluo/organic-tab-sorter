@@ -81,23 +81,17 @@ chrome.storage.sync.get('defaultSortMode', (data) => {
 
 // Load and display keyboard shortcuts
 chrome.commands.getAll((commands) => {
-  const shortcutTitleEl = document.getElementById('shortcut-title');
-  const shortcutWebsiteEl = document.getElementById('shortcut-website');
+  const shortcutEl = document.getElementById('shortcut-sort');
 
   commands.forEach((command) => {
     const shortcut = command.shortcut || 'Not set';
-    if (command.name === 'sort-by-title') {
-      shortcutTitleEl.textContent = `${shortcut}: Sort by Title`;
-    } else if (command.name === 'sort-by-website') {
-      shortcutWebsiteEl.textContent = `${shortcut}: Sort by Website`;
+    if (command.name === 'sort-tabs') {
+      shortcutEl.textContent = `${shortcut}: Sort tabs using default order`;
     }
   });
 
-  // Fallback if commands not found
-  if (shortcutTitleEl.textContent === 'Loading...') {
-    shortcutTitleEl.textContent = 'Alt+Shift+T: Sort by Title (default)';
-  }
-  if (shortcutWebsiteEl.textContent === 'Loading...') {
-    shortcutWebsiteEl.textContent = 'Alt+Shift+W: Sort by Website (default)';
+  // Fallback if command not found
+  if (shortcutEl.textContent === 'Loading...') {
+    shortcutEl.textContent = 'Alt+Shift+S: Sort tabs using default order';
   }
 });
