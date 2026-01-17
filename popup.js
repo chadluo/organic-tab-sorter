@@ -2,9 +2,9 @@
 
 const statusEl = document.getElementById('status');
 const sortByTitleBtn = document.getElementById('sortByTitle');
-const sortByUrlBtn = document.getElementById('sortByUrl');
+const sortByWebsiteBtn = document.getElementById('sortByWebsite');
 const defaultTitleRadio = document.getElementById('defaultTitle');
-const defaultUrlRadio = document.getElementById('defaultUrl');
+const defaultWebsiteRadio = document.getElementById('defaultWebsite');
 
 // Update status message
 function setStatus(message, isError = false) {
@@ -32,12 +32,12 @@ sortByTitleBtn.addEventListener('click', () => {
   });
 });
 
-// Sort by URL
-sortByUrlBtn.addEventListener('click', () => {
-  setStatus('Sorting by URL...');
-  chrome.runtime.sendMessage({ action: 'sortByUrl' }, (response) => {
+// Sort by website
+sortByWebsiteBtn.addEventListener('click', () => {
+  setStatus('Sorting by website...');
+  chrome.runtime.sendMessage({ action: 'sortByWebsite' }, (response) => {
     if (response && response.success) {
-      setStatus('Sorted by URL!');
+      setStatus('Sorted by website!');
     } else {
       setStatus('Error sorting tabs', true);
     }
@@ -58,33 +58,38 @@ defaultTitleRadio.addEventListener('change', () => {
   }
 });
 
-defaultUrlRadio.addEventListener('change', () => {
-  if (defaultUrlRadio.checked) {
-    saveDefaultSort('url');
+defaultWebsiteRadio.addEventListener('change', () => {
+  if (defaultWebsiteRadio.checked) {
+    saveDefaultSort('website');
   }
 });
 
 // Load saved preference on popup open
 chrome.storage.sync.get('defaultSortMode', (data) => {
-  const defaultMode = data.defaultSortMode || 'url';
+  let defaultMode = data.defaultSortMode || 'website';
+  // Backward compatibility: migrate 'url' to 'website'
+  if (defaultMode === 'url') {
+    defaultMode = 'website';
+    chrome.storage.sync.set({ defaultSortMode: 'website' });
+  }
   if (defaultMode === 'title') {
     defaultTitleRadio.checked = true;
   } else {
-    defaultUrlRadio.checked = true;
+    defaultWebsiteRadio.checked = true;
   }
 });
 
 // Load and display keyboard shortcuts
 chrome.commands.getAll((commands) => {
   const shortcutTitleEl = document.getElementById('shortcut-title');
-  const shortcutUrlEl = document.getElementById('shortcut-url');
+  const shortcutWebsiteEl = document.getElementById('shortcut-website');
 
   commands.forEach((command) => {
     const shortcut = command.shortcut || 'Not set';
     if (command.name === 'sort-by-title') {
       shortcutTitleEl.textContent = `${shortcut}: Sort by Title`;
-    } else if (command.name === 'sort-by-url') {
-      shortcutUrlEl.textContent = `${shortcut}: Sort by URL`;
+    } else if (command.name === 'sort-by-website') {
+      shortcutWebsiteEl.textContent = `${shortcut}: Sort by Website`;
     }
   });
 
@@ -92,7 +97,7 @@ chrome.commands.getAll((commands) => {
   if (shortcutTitleEl.textContent === 'Loading...') {
     shortcutTitleEl.textContent = 'Alt+Shift+T: Sort by Title (default)';
   }
-  if (shortcutUrlEl.textContent === 'Loading...') {
-    shortcutUrlEl.textContent = 'Alt+Shift+U: Sort by URL (default)';
+  if (shortcutWebsiteEl.textContent === 'Loading...') {
+    shortcutWebsiteEl.textContent = 'Alt+Shift+W: Sort by Website (default)';
   }
 });

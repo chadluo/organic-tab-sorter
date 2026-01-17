@@ -54,8 +54,8 @@ async function sortByTitle() {
   }
 }
 
-// Sort tabs by URL (domain-aware)
-async function sortByUrl() {
+// Sort tabs by website (domain-aware)
+async function sortByWebsite() {
   const tabs = await chrome.tabs.query({ currentWindow: true });
 
   // Separate tabs into categories: pinned, grouped, and ungrouped
@@ -67,14 +67,14 @@ async function sortByUrl() {
     (tab) => !tab.pinned && tab.groupId === chrome.tabGroups.TAB_GROUP_ID_NONE,
   );
 
-  // Sort pinned tabs by URL
+  // Sort pinned tabs by website
   pinnedTabs.sort((a, b) => {
     const keyA = getUrlSortKey(a.url);
     const keyB = getUrlSortKey(b.url);
     return keyA.localeCompare(keyB);
   });
 
-  // Sort ungrouped tabs by URL
+  // Sort ungrouped tabs by website
   ungroupedTabs.sort((a, b) => {
     const keyA = getUrlSortKey(a.url);
     const keyB = getUrlSortKey(b.url);
@@ -95,8 +95,8 @@ async function sortByUrl() {
 chrome.commands.onCommand.addListener((command) => {
   if (command === "sort-by-title") {
     sortByTitle();
-  } else if (command === "sort-by-url") {
-    sortByUrl();
+  } else if (command === "sort-by-website") {
+    sortByWebsite();
   }
 });
 
@@ -111,8 +111,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         sendResponse({ success: false, error: error.message });
       });
     return true; // Keep message channel open for async response
-  } else if (message.action === "sortByUrl") {
-    sortByUrl()
+  } else if (message.action === "sortByWebsite") {
+    sortByWebsite()
       .then(() => {
         sendResponse({ success: true });
       })

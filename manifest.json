@@ -13,11 +13,11 @@
                 "mac": "Alt+Shift+T"
             }
         },
-        "sort-by-url": {
-            "description": "Sort tabs by URL",
+        "sort-by-website": {
+            "description": "Sort tabs by website",
             "suggested_key": {
-                "default": "Alt+Shift+U",
-                "mac": "Alt+Shift+U"
+                "default": "Alt+Shift+W",
+                "mac": "Alt+Shift+W"
             }
         }
     },

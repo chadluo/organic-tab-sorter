@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Chrome/Chromium browser extension called "Organic Tab Sorter" that sorts browser tabs by title or URL with domain-aware sorting. It uses Manifest V3, the latest Chrome extension API specification.
+This is a Chrome/Chromium browser extension called "Organic Tab Sorter" that sorts browser tabs by title or website with domain-aware sorting. It uses Manifest V3, the latest Chrome extension API specification.
 
 ## Architecture
 
@@ -23,7 +23,7 @@ The extension follows a standard Manifest V3 Chrome extension structure with a b
 **Sorting Logic (background.js)**:
 
 - `sortByTitle()`: Sorts tabs alphabetically using `localeCompare()`
-- `sortByUrl()`: Domain-aware sorting that parses URLs into sort keys like `/com/google/dev/path`
+- `sortByWebsite()`: Domain-aware sorting that parses URLs into sort keys like `/com/google/dev/path`
 - `getUrlSortKey()`: Reverses domain parts (TLD first) and appends path for intelligent grouping
 - Pinned tabs are kept at the beginning and sorted separately within their group
 - Grouped tabs are preserved in their original order and moved to the left side (after pinned tabs, before ungrouped tabs)
@@ -38,7 +38,7 @@ The extension follows a standard Manifest V3 Chrome extension structure with a b
 **Settings Storage**:
 
 - Uses `chrome.storage.sync` for cross-device preference sync
-- Stores `defaultSortMode` as either "title" or "url"
+- Stores `defaultSortMode` as either "title" or "website"
 - Settings loaded on popup open and saved on radio button change
 
 ## Development Workflow
@@ -76,7 +76,7 @@ After making code changes:
 - Open multiple tabs with various URLs
 - Create some tab groups with multiple tabs
 - Press `Alt+Shift+T` to test title sorting
-- Press `Alt+Shift+U` to test URL sorting
+- Press `Alt+Shift+W` to test website sorting
 - Verify tabs reorder without opening popup
 - Verify grouped tabs move to the left and maintain their internal order
 
@@ -125,7 +125,7 @@ After making code changes:
 All sorting logic is in [background.js](background.js). The two main functions are:
 
 - `sortByTitle()` - Modify for title sorting changes
-- `sortByUrl()` - Modify for URL sorting changes
+- `sortByWebsite()` - Modify for website sorting changes
 - `getUrlSortKey()` - Modify to change how URLs are parsed/grouped
 
 Both sorting functions follow this pattern:
@@ -137,7 +137,7 @@ Both sorting functions follow this pattern:
 
 ### Changing Keyboard Shortcuts
 
-Edit the `commands` section in [manifest.json](manifest.json). Default shortcuts are `Alt+Shift+T` (title) and `Alt+Shift+U` (URL). Users can customize shortcuts via `chrome://extensions/shortcuts`.
+Edit the `commands` section in [manifest.json](manifest.json). Default shortcuts are `Alt+Shift+T` (title) and `Alt+Shift+W` (website). Users can customize shortcuts via `chrome://extensions/shortcuts`.
 
 ### Working with Tab Groups
 
