@@ -8,7 +8,16 @@ function getUrlSortKey(url) {
     const parts = hostname.split('.').reverse(); // ["com", "google", "dev"]
     const path = urlObj.pathname;
 
-    return '/' + parts.join('/') + path; // "/com/google/dev/products/chrome"
+    // Generic TLDs to ignore when sorting (common, non-semantic TLDs)
+    const genericTlds = new Set(['com', 'net', 'org']);
+
+    // Remove the TLD (first element after reverse) if it's a generic one
+    // This keeps semantic TLDs like 'ai', 'gallery', 'dev', etc.
+    if (parts.length > 0 && genericTlds.has(parts[0])) {
+      parts.shift(); // Remove the generic TLD
+    }
+
+    return '/' + parts.join('/') + path; // "/google/dev/products/chrome"
   } catch (error) {
     // Handle invalid URLs (chrome://, about:, etc.)
     return url;
