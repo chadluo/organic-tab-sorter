@@ -14,13 +14,15 @@
     "commands": {
         "sort-by-title": {
             "suggested_key": {
-                "default": "Ctrl+Shift+T"
+                "default": "Alt+Shift+T",
+                "mac": "Alt+Shift+T"
             },
             "description": "Sort tabs by title"
         },
         "sort-by-url": {
             "suggested_key": {
-                "default": "Ctrl+Shift+U"
+                "default": "Alt+Shift+U",
+                "mac": "Alt+Shift+U"
             },
             "description": "Sort tabs by URL"
         }
