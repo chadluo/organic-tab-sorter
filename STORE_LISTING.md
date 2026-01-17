@@ -10,66 +10,36 @@ Sort browser tabs by title or URL with intelligent domain grouping. Preserves pi
 
 ## Detailed Description
 
-Tired of hunting through dozens of browser tabs? Organic Tab Sorter helps you organize your tabs instantly with smart sorting that understands how websites are related.
+A browser extension that sorts tabs in the current window by title or URL.
 
-### Key Features
+## Features
 
-**Two Sorting Modes:**
+### Sort by Title
 
-- Sort by Title: Alphabetically organize tabs by their page titles
-- Sort by URL: Intelligent domain-aware sorting that groups related websites together
+Alphabetically sorts tabs by their page titles using standard locale-aware comparison.
 
-**Smart Domain Grouping:**
-The URL sorting mode understands website structure and groups related sites intelligently. For example, dev.google.com and mail.google.com will appear next to each other because they share the same domain, not scattered across your tab bar.
+### Sort by URL
 
-**Lightning-Fast Keyboard Shortcuts:**
+Domain-aware sorting that groups tabs from the same website together. URLs are parsed and sorted by domain hierarchy (TLD, second-level domain, subdomains, then path). For example:
 
-- Alt+Shift+T: Sort by title (instantly, without opening the popup)
-- Alt+Shift+U: Sort by URL (instantly, without opening the popup)
+- `developers.google.com` and `mail.google.com` appear adjacent
+- `github.com/user/repo1` and `github.com/user/repo2` are grouped together
 
-**Preserves Your Tab Organization:**
+### Keyboard Shortcuts
 
-- Pinned tabs stay pinned and at the beginning
-- Tab groups remain intact and move to the left side
-- Tabs within groups maintain their original order
-- Only ungrouped tabs are sorted and reordered
+By default:
 
-**Persistent Settings:**
-Save your preferred default sort mode, and it syncs across all your Chrome browsers when signed in.
+- Alt+Shift+T: Sort by title
+- Alt+Shift+U: Sort by URL
+- Customizable via chrome://extensions/shortcuts
 
-### How It Works
+### Settings
 
-Simply click the extension icon and choose "By Title" or "By URL" to instantly organize your tabs. Or use the keyboard shortcuts for even faster sorting without interrupting your workflow.
+Default sort preference is saved and syncs across Chrome browsers when signed in.
 
-The domain-aware URL sorting is particularly powerful:
+## Privacy
 
-- <https://dev.google.com/products> → grouped with other Google domains
-- <https://github.com/user/repo> → grouped with other GitHub URLs
-- <https://docs.python.org/3/> → grouped with other Python documentation
-
-This ensures sites from the same service stay together, making it easy to find what you need.
-
-### Perfect For
-
-- Developers juggling documentation, code repos, and development tools
-- Researchers with multiple tabs from similar sources
-- Anyone who regularly works with many browser tabs
-- Power users who prefer keyboard shortcuts
-- People who use tab groups to organize their work
-
-### Privacy
-
-Organic Tab Sorter respects your privacy:
-
-- Only stores your sort preference locally
-- Does NOT collect or transmit any browsing data
-- Does NOT track which websites you visit
-- Does NOT access page content
-- No analytics, no tracking, no external servers
-
-### Open Source
-
-This extension is open source. View the code, report issues, or contribute on GitHub.
+The extension only stores your sort preference using Chrome's sync storage. No browsing data, page content, or usage analytics are collected or transmitted.
 
 ## Category
 
@@ -81,11 +51,11 @@ English
 
 ## Privacy Policy URL
 
-[Your GitHub Pages URL or hosting URL for PRIVACY.md]
+<https://github.com/chadluo/organic-tab-sorter/blob/main/PRIVACY.md>
 
 ## Support/Homepage URL
 
-[Your GitHub repository URL]
+<https://github.com/chadluo/organic-tab-sorter>
 
 ## Tags/Keywords
 
