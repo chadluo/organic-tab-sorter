@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body {
+      width: 300px;
+      padding: 15px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      font-size: 14px;
+    }
+
+    h1 {
+      font-size: 18px;
+      margin: 0 0 15px 0;
+      color: #333;
+    }
+
+    .section {
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: #555;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 10px;
+    }
+
+    button {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background: #f8f9fa;
+      cursor: pointer;
+      font-size: 13px;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: #e9ecef;
+    }
+
+    button:active {
+      background: #dee2e6;
+    }
+
+    .radio-group {
+      display: flex;
+      gap: 15px;
+    }
+
+    .radio-option {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .radio-option input[type="radio"] {
+      cursor: pointer;
+    }
+
+    .radio-option label {
+      cursor: pointer;
+    }
+
+    #status {
+      padding: 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      text-align: center;
+      background: #e7f3ff;
+      color: #0066cc;
+    }
+
+    .shortcuts {
+      font-size: 11px;
+      color: #888;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid #eee;
+    }
+
+    .shortcuts-title {
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .shortcuts div {
+      margin: 3px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>Organic Tab Sorter</h1>
+
+  <div class="section">
+    <div class="section-title">Sort Tabs:</div>
+    <div class="button-group">
+      <button id="sortByTitle">By Title</button>
+      <button id="sortByUrl">By URL</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Default Sort Order:</div>
+    <div class="radio-group">
+      <div class="radio-option">
+        <input type="radio" id="defaultTitle" name="defaultSort" value="title">
+        <label for="defaultTitle">Title</label>
+      </div>
+      <div class="radio-option">
+        <input type="radio" id="defaultUrl" name="defaultSort" value="url">
+        <label for="defaultUrl">URL</label>
+      </div>
+    </div>
+  </div>
+
+  <div id="status">Ready</div>
+
+  <div class="shortcuts">
+    <div class="shortcuts-title">Keyboard Shortcuts:</div>
+    <div>Ctrl+Shift+T: Sort by Title</div>
+    <div>Ctrl+Shift+U: Sort by URL</div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
