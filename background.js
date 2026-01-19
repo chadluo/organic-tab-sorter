@@ -6,20 +6,35 @@ function getUrlSortKey(url) {
     const urlObj = new URL(url);
     const protocol = urlObj.protocol.replace(":", ""); // "https", "chrome", "file", etc.
     const hostname = urlObj.hostname;
-    const parts = hostname.split(".").reverse(); // ["com", "google", "dev"]
+    const parts = hostname.split(".").reverse(); // ["com", "google", "www"]
     const path = urlObj.pathname;
 
-    // Generic TLDs to ignore when sorting (common, non-semantic TLDs)
-    const genericTlds = new Set(["com", "net", "org"]);
+    // Generic second-level domains (typically paired with country codes)
+    const genericSlds = new Set(["co", "com", "net", "org", "gov", "edu", "ac", "mil"]);
 
-    // Remove the TLD (first element after reverse) if it's a generic one
-    // This keeps semantic TLDs like 'ai', 'gallery', 'dev', etc.
-    if (parts.length > 0 && genericTlds.has(parts[0])) {
-      parts.shift(); // Remove the generic TLD
+    // Extract the root domain
+    let domain = "";
+
+    if (parts.length === 0) {
+      domain = hostname;
+    } else if (parts.length === 1) {
+      // Single part like "localhost"
+      domain = parts[0];
+    } else if (parts.length >= 3 &&
+               parts[0].length === 2 && // Country code (2 letters)
+               genericSlds.has(parts[1])) { // Generic second-level domain
+      // Country TLD + generic SLD pattern (e.g., au.com.finder)
+      // e.g., ["au", "com", "finder"] -> "finder.com.au"
+      domain = parts[2] + "." + parts[1] + "." + parts[0];
+    } else {
+      // Standard case: take domain + TLD (works for both generic and semantic TLDs)
+      // e.g., ["com", "google"] -> "google.com"
+      // e.g., ["ai", "anthropic"] -> "anthropic.ai"
+      domain = parts[1] + "." + parts[0];
     }
 
-    // Prepend protocol to sort key: "/chrome/extensions" for chrome://extensions/
-    return "/" + protocol + "/" + parts.join("/") + path;
+    // Prepend protocol and domain: "/https/google.com/path"
+    return "/" + protocol + "/" + domain + path;
   } catch (error) {
     return url;
   }
