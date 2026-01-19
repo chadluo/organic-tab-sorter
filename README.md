@@ -37,21 +37,23 @@ A Chrome extension that sorts browser tabs in the current window by title or URL
 
 ## How URL Sorting Works
 
-The extension uses domain-aware sorting to intelligently group related websites:
+The extension uses smart domain extraction to intelligently group related websites:
 
-- `https://dev.google.com/products` → `/https/google/dev/products`
-- `https://mail.google.com/inbox` → `/https/google/mail/inbox`
+- `https://google.com/search` → `/https/google.com/search`
+- `https://mail.google.com/inbox` → `/https/google.com/inbox`
+- `https://finder.com.au/insurance` → `/https/finder.com.au/insurance`
+- `https://anthropic.ai/research` → `/https/anthropic.ai/research`
 - `chrome://extensions/` → `/chrome/extensions/`
-- `https://developer.apple.com/docs` → `/https/apple/developer/docs`
 
 This ensures:
 
 - Tabs are first grouped by protocol (https, chrome, file, etc.)
-- Within each protocol, sites with the same domain are grouped together
-- Generic TLDs (.com, .net, .org) are removed from sorting to improve grouping
-- Semantic TLDs (like .ai, .dev, .gallery) are preserved
-- Subdomains are sorted logically within their parent domain
-- `dev.google.com` appears near `mail.google.com`, not near `dev.apple.com`
+- Within each protocol, sites are grouped by their root domain
+- **Smart domain extraction** handles country-specific TLDs:
+  - Generic TLDs + country codes (e.g., `.com.au`, `.co.uk`, `.org.nz`) are kept together
+  - Modern semantic TLDs (e.g., `.ai`, `.dev`, `.app`) are treated as part of the domain
+  - All subdomains are grouped under their root domain
+- `mail.google.com` appears with `google.com`, not near `mail.example.com`
 
 ## Tab Organization
 

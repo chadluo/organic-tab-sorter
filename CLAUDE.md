@@ -23,8 +23,13 @@ The extension follows a standard Manifest V3 Chrome extension structure with a b
 **Sorting Logic (background.js)**:
 
 - `sortByTitle()`: Sorts tabs alphabetically using `localeCompare()`
-- `sortByWebsite()`: Domain-aware sorting that parses URLs into sort keys like `/https/google/dev/path`
-- `getUrlSortKey()`: Prepends protocol, reverses domain parts (excluding generic TLDs like .com/.net/.org), and appends path for intelligent grouping
+- `sortByWebsite()`: Domain-aware sorting that parses URLs into sort keys like `/https/google.com/path`
+- `getUrlSortKey()`: Extracts root domain from URLs with smart TLD handling:
+  - Detects country TLD + generic SLD patterns (e.g., `.com.au`, `.co.uk`) and extracts 3-part domains
+  - Handles modern semantic TLDs (e.g., `.ai`, `.dev`, `.app`) by extracting 2-part domains
+  - Groups all subdomains under their root domain (e.g., `mail.google.com` → `google.com`)
+  - Prepends protocol and appends path for complete sort key
+  - Generic SLDs recognized: `co`, `com`, `net`, `org`, `gov`, `edu`, `ac`, `mil`
 - Pinned tabs are kept at the beginning and sorted separately within their group
 - Grouped tabs are preserved in their original order and moved to the left side (after pinned tabs, before ungrouped tabs)
 - Only ungrouped tabs are sorted and reordered
