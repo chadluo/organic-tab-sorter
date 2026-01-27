@@ -1,0 +1,23 @@
+{
+  "name": "organic-tab-sorter",
+  "version": "1.0.0",
+  "description": "Organic tab sorter extension",
+  "homepage": "https://github.com/chadluo/organic-tab-sorter#readme",
+  "bugs": {
+    "url": "https://github.com/chadluo/organic-tab-sorter/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chadluo/organic-tab-sorter.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "background.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@types/chrome": "^0.1.36"
+  }
+}
