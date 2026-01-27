@@ -74,17 +74,33 @@ async function sortTabs(compareFn) {
     (tab) => !tab.pinned && tab.groupId === chrome.tabGroups.TAB_GROUP_ID_NONE,
   );
 
+  // Get unique group IDs in their original order and count tabs per group
+  const groupIds = [...new Set(groupedTabs.map((tab) => tab.groupId))];
+  const groupSizes = new Map();
+  for (const tab of groupedTabs) {
+    groupSizes.set(tab.groupId, (groupSizes.get(tab.groupId) || 0) + 1);
+  }
+
   // Sort pinned and ungrouped tabs using the provided compare function
   pinnedTabs.sort(compareFn);
   ungroupedTabs.sort(compareFn);
 
-  // Keep grouped tabs in their original order (preserve group internal order)
-  // Grouped tabs are already in the correct relative order from the query
+  // Move pinned tabs to the front
+  for (let i = 0; i < pinnedTabs.length; i++) {
+    await chrome.tabs.move(pinnedTabs[i].id, { index: i });
+  }
 
-  // Move tabs to their new positions: pinned first, then grouped, then ungrouped
-  const sortedTabs = [...pinnedTabs, ...groupedTabs, ...ungroupedTabs];
-  for (let i = 0; i < sortedTabs.length; i++) {
-    chrome.tabs.move(sortedTabs[i].id, { index: i });
+  // Move entire tab groups to after pinned tabs
+  // Iterate forward and calculate correct index based on previous group sizes
+  let groupTargetIndex = pinnedTabs.length;
+  for (const groupId of groupIds) {
+    await chrome.tabGroups.move(groupId, { index: groupTargetIndex });
+    groupTargetIndex += groupSizes.get(groupId);
+  }
+
+  // Move ungrouped tabs to after the groups
+  for (let i = 0; i < ungroupedTabs.length; i++) {
+    await chrome.tabs.move(ungroupedTabs[i].id, { index: groupTargetIndex + i });
   }
 }
 
