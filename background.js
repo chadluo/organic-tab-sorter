@@ -38,51 +38,13 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   }
 });
 
-
-
 // Sort tabs by title
 async function sortByTitle() {
-  const tabs = await chrome.tabs.query({ currentWindow: true });
-
-  // Separate tabs into categories: pinned, grouped, and ungrouped
-  const pinnedTabs = tabs.filter((tab) => tab.pinned);
-
-  const groupedTabs = tabs.filter(
-    (tab) => !tab.pinned && tab.groupId !== chrome.tabGroups.TAB_GROUP_ID_NONE,
-  );
-  const ungroupedTabs = tabs.filter(
-    (tab) => !tab.pinned && tab.groupId === chrome.tabGroups.TAB_GROUP_ID_NONE,
-  );
-
-  // Sort pinned tabs by title
-  pinnedTabs.sort((a, b) => a.title.localeCompare(b.title));
-
-  // Sort ungrouped tabs by title
-  ungroupedTabs.sort((a, b) => a.title.localeCompare(b.title));
-
-  // Keep grouped tabs in their original order (preserve group internal order)
-  // Grouped tabs are already in the correct relative order from the query
-
-  // Move tabs to their new positions: pinned first, then grouped, then ungrouped
-  const sortedTabs = [...pinnedTabs, ...groupedTabs, ...ungroupedTabs];
-  for (let i = 0; i < sortedTabs.length; i++) {
-    chrome.tabs.move(sortedTabs[i].id, { index: i });
-  }
+  return sortTabs((a, b) => a.title.localeCompare(b.title));
 }
 
 // Sort tabs by website (domain-aware)
 async function sortByWebsite() {
-  const tabs = await chrome.tabs.query({ currentWindow: true });
-
-  // Separate tabs into categories: pinned, grouped, and ungrouped
-  const pinnedTabs = tabs.filter((tab) => tab.pinned);
-  const groupedTabs = tabs.filter(
-    (tab) => !tab.pinned && tab.groupId !== chrome.tabGroups.TAB_GROUP_ID_NONE,
-  );
-  const ungroupedTabs = tabs.filter(
-    (tab) => !tab.pinned && tab.groupId === chrome.tabGroups.TAB_GROUP_ID_NONE,
-  );
-
   // Cache URL sort keys to avoid redundant parsing during comparison
   const sortKeyCache = new Map();
   const getCachedSortKey = (url) => {
@@ -92,19 +54,29 @@ async function sortByWebsite() {
     return sortKeyCache.get(url);
   };
 
-  // Sort pinned tabs by website
-  pinnedTabs.sort((a, b) => {
+  return sortTabs((a, b) => {
     const keyA = getCachedSortKey(a.url);
     const keyB = getCachedSortKey(b.url);
     return keyA.localeCompare(keyB);
   });
+}
 
-  // Sort ungrouped tabs by website
-  ungroupedTabs.sort((a, b) => {
-    const keyA = getCachedSortKey(a.url);
-    const keyB = getCachedSortKey(b.url);
-    return keyA.localeCompare(keyB);
-  });
+// Common sorting function that accepts a compare function
+async function sortTabs(compareFn) {
+  const tabs = await chrome.tabs.query({ currentWindow: true });
+
+  // Separate tabs into categories: pinned, grouped, and ungrouped
+  const pinnedTabs = tabs.filter((tab) => tab.pinned);
+  const groupedTabs = tabs.filter(
+    (tab) => !tab.pinned && tab.groupId !== chrome.tabGroups.TAB_GROUP_ID_NONE,
+  );
+  const ungroupedTabs = tabs.filter(
+    (tab) => !tab.pinned && tab.groupId === chrome.tabGroups.TAB_GROUP_ID_NONE,
+  );
+
+  // Sort pinned and ungrouped tabs using the provided compare function
+  pinnedTabs.sort(compareFn);
+  ungroupedTabs.sort(compareFn);
 
   // Keep grouped tabs in their original order (preserve group internal order)
   // Grouped tabs are already in the correct relative order from the query
