@@ -1,5 +1,8 @@
 // Background service worker for Organic Tab Sorter
 
+// Generic second-level domains (typically paired with country codes)
+const GENERIC_SLDS = new Set(["co", "com", "net", "org", "gov", "edu", "ac", "mil"]);
+
 // Listen for keyboard shortcuts
 chrome.commands.onCommand.addListener((command) => {
   if (command === "sort-tabs") {
@@ -105,40 +108,22 @@ async function sortTabs(compareFn) {
 }
 
 // Parse URL to create sort key for domain-aware sorting
+// e.g., "https://mail.google.com/inbox" -> "/https/google.com/mail/inbox"
 function getUrlSortKey(url) {
   try {
     const urlObj = new URL(url);
-    const protocol = urlObj.protocol.replace(":", ""); // "https", "chrome", "file", etc.
-    const hostname = urlObj.hostname;
-    const parts = hostname.split(".").reverse(); // ["com", "google", "www"]
+    const protocol = urlObj.protocol.replace(":", "");
+    const parts = urlObj.hostname.split(".").reverse(); // ["com", "google", "mail"]
     const path = urlObj.pathname;
 
-    // Generic second-level domains (typically paired with country codes)
-    const genericSlds = new Set(["co", "com", "net", "org", "gov", "edu", "ac", "mil"]);
+    // Country TLD + generic SLD (e.g., .com.au) uses 3 parts, otherwise 2 (or 1 for localhost)
+    const isCountryTld = parts.length >= 3 && parts[0].length === 2 && GENERIC_SLDS.has(parts[1]);
+    const domainPartCount = isCountryTld ? 3 : Math.min(2, parts.length);
 
-    // Extract the root domain
-    let domain = "";
+    const domain = parts.slice(0, domainPartCount).reverse().join(".");
+    const subdomains = parts.slice(domainPartCount).join("/");
 
-    if (parts.length === 0) {
-      domain = hostname;
-    } else if (parts.length === 1) {
-      // Single part like "localhost"
-      domain = parts[0];
-    } else if (parts.length >= 3 &&
-      parts[0].length === 2 && // Country code (2 letters)
-      genericSlds.has(parts[1])) { // Generic second-level domain
-      // Country TLD + generic SLD pattern (e.g., au.com.finder)
-      // e.g., ["au", "com", "finder"] -> "finder.com.au"
-      domain = parts[2] + "." + parts[1] + "." + parts[0];
-    } else {
-      // Standard case: take domain + TLD (works for both generic and semantic TLDs)
-      // e.g., ["com", "google"] -> "google.com"
-      // e.g., ["ai", "anthropic"] -> "anthropic.ai"
-      domain = parts[1] + "." + parts[0];
-    }
-
-    // Prepend protocol and domain: "/https/google.com/path"
-    return "/" + protocol + "/" + domain + path;
+    return "/" + protocol + "/" + domain + (subdomains ? "/" + subdomains : "") + path;
   } catch (error) {
     return url;
   }
