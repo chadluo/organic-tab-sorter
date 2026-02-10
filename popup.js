@@ -3,8 +3,10 @@
 const statusEl = document.getElementById('status');
 const sortByTitleBtn = document.getElementById('sortByTitle');
 const sortByWebsiteBtn = document.getElementById('sortByWebsite');
+const sortByLastAccessedBtn = document.getElementById('sortByLastAccessed');
 const defaultTitleRadio = document.getElementById('defaultTitle');
 const defaultWebsiteRadio = document.getElementById('defaultWebsite');
+const defaultLastAccessedRadio = document.getElementById('defaultLastAccessed');
 
 // Update status message
 function setStatus(message, isError = false) {
@@ -44,6 +46,18 @@ sortByWebsiteBtn.addEventListener('click', () => {
   });
 });
 
+// Sort by last accessed
+sortByLastAccessedBtn.addEventListener('click', () => {
+  setStatus('Sorting by last accessed...');
+  chrome.runtime.sendMessage({ action: 'sortByLastAccessed' }, (response) => {
+    if (response && response.success) {
+      setStatus('Sorted by last accessed!');
+    } else {
+      setStatus('Error sorting tabs', true);
+    }
+  });
+});
+
 // Save default sort preference
 function saveDefaultSort(value) {
   chrome.storage.sync.set({ defaultSortMode: value }, () => {
@@ -64,6 +78,12 @@ defaultWebsiteRadio.addEventListener('change', () => {
   }
 });
 
+defaultLastAccessedRadio.addEventListener('change', () => {
+  if (defaultLastAccessedRadio.checked) {
+    saveDefaultSort('lastAccessed');
+  }
+});
+
 // Load saved preference on popup open
 chrome.storage.sync.get('defaultSortMode', (data) => {
   let defaultMode = data.defaultSortMode || 'website';
@@ -74,6 +94,8 @@ chrome.storage.sync.get('defaultSortMode', (data) => {
   }
   if (defaultMode === 'title') {
     defaultTitleRadio.checked = true;
+  } else if (defaultMode === 'lastAccessed') {
+    defaultLastAccessedRadio.checked = true;
   } else {
     defaultWebsiteRadio.checked = true;
   }

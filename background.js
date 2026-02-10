@@ -11,6 +11,8 @@ chrome.commands.onCommand.addListener((command) => {
       const defaultMode = data.defaultSortMode || "website";
       if (defaultMode === "title") {
         sortByTitle();
+      } else if (defaultMode === "lastAccessed") {
+        sortByLastAccessed();
       } else {
         sortByWebsite();
       }
@@ -22,6 +24,15 @@ chrome.commands.onCommand.addListener((command) => {
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message.action === "sortByTitle") {
     sortByTitle()
+      .then(() => {
+        sendResponse({ success: true });
+      })
+      .catch((error) => {
+        sendResponse({ success: false, error: error.message });
+      });
+    return true; // Keep message channel open for async response
+  } else if (message.action === "sortByLastAccessed") {
+    sortByLastAccessed()
       .then(() => {
         sendResponse({ success: true });
       })
@@ -44,6 +55,11 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 // Sort tabs by title
 async function sortByTitle() {
   return sortTabs((a, b) => a.title.localeCompare(b.title));
+}
+
+// Sort tabs by last accessed time (most recent first)
+async function sortByLastAccessed() {
+  return sortTabs((a, b) => (a.lastAccessed || 0) - (b.lastAccessed || 0));
 }
 
 // Sort tabs by website (domain-aware)
