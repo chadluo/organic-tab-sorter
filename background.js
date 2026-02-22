@@ -1,8 +1,5 @@
 // Background service worker for Organic Tab Sorter
 
-// Generic second-level domains (typically paired with country codes)
-const GENERIC_SLDS = new Set(["co", "com", "net", "org", "gov", "edu", "ac", "mil"]);
-
 // Listen for keyboard shortcuts
 chrome.commands.onCommand.addListener((command) => {
   if (command === "sort-tabs") {
@@ -54,7 +51,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 
 // Sort tabs by title
 async function sortByTitle() {
-  return sortTabs((a, b) => a.title.localeCompare(b.title));
+  return sortTabs((a, b) => naturalCompare(a.title, b.title));
 }
 
 // Sort tabs by last accessed time (most recent first)
@@ -76,7 +73,7 @@ async function sortByWebsite() {
   return sortTabs((a, b) => {
     const keyA = getCachedSortKey(a.url);
     const keyB = getCachedSortKey(b.url);
-    return keyA.localeCompare(keyB);
+    return naturalCompare(keyA, keyB);
   });
 }
 
@@ -122,6 +119,21 @@ async function sortTabs(compareFn) {
     await chrome.tabs.move(ungroupedTabs[i].id, { index: groupTargetIndex + i });
   }
 }
+
+// Natural string comparison: compares strings normally but treats trailing
+// numbers numerically so "ticket-8" < "ticket-10" instead of "ticket-10" < "ticket-8"
+function naturalCompare(a, b) {
+  const re = /^(.*?)(\d+)$/;
+  const matchA = a.match(re);
+  const matchB = b.match(re);
+  if (matchA && matchB && matchA[1] === matchB[1]) {
+    return parseInt(matchA[2], 10) - parseInt(matchB[2], 10);
+  }
+  return a.localeCompare(b);
+}
+
+// Generic second-level domains (typically paired with country codes)
+const GENERIC_SLDS = new Set(["co", "com", "net", "org", "gov", "edu", "ac", "mil"]);
 
 // Parse URL to create sort key for domain-aware sorting
 // e.g., "https://mail.google.com/inbox" -> "/https/google.com/mail/inbox"
